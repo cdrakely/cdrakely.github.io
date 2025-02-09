@@ -1,0 +1,41 @@
+/*-- scss:defaults --*/
+
+$white:    #e7e7e7;
+$gray-100: #fdf6e3;
+$gray-200: #eee8d5;
+$gray-300: #d1ccbc;
+$gray-400: #bcc2c9;
+$gray-500: #adb5bd;
+$gray-600: #839496;
+$gray-700: #495057;
+$gray-800: #073642;
+$gray-900: #002b36;
+$black:    #000;
+
+$blue:    #87c2d1;
+$indigo:  #99a6df;
+$purple:  #b99af1;
+$pink:    #facce1;
+$red:     #f37575;
+$orange:  #f3d3a4;
+$yellow:  #f5f7ac;
+$green:   #adf7ce;
+$teal:    #87ecce;
+$cyan:    #a3eef3;
+
+$body-bg:   $gray-900;
+$body-color:    $gray-500;
+
+$primary:       $green;
+$secondary:     $gray-600;
+
+$navbar-bg: $primary;
+
+// Code Colors
+$monobackgroundcolor: $gray-300;
+
+$headings-color:    $primary;
+
+// Table of Contents
+$toc-inactive-border: $orange;
+$linkcolor: $orange;

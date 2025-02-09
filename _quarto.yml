@@ -1,0 +1,23 @@
+project:
+  type: website
+  output-dir: "docs"
+
+website:
+  title: "Clay Drakely"
+  navbar:
+    right:
+      - posts.qmd
+      - current_projs.qmd
+      - icon: github
+        href: https://github.com/cdrakely
+      - icon: linkedin
+        href: https://www.linkedin.com/in/cdrakely/  
+format:
+  html:
+    theme:
+      light: [minty, brand, brand/theme-light.scss]
+      dark: [solar, brand, brand/theme-dark.scss]
+    css: styles.css
+
+
+

@@ -1,0 +1,45 @@
+/*-- scss:defaults --*/
+
+// Base Document Colors
+$white: #fcfceb;
+$gray-100: #e5e6e3;
+$gray-200: #caccc7;
+$gray-300: #b0b6a6;
+$gray-400: #aaad97;
+$gray-500: #92967e;
+$gray-600: #7f836c;
+$gray-700: #626550;
+$gray-800: #585c44;
+$gray-900: #464b31;
+$black:    #232715;
+
+
+
+$blue:    #0c81ee;
+$indigo:  #9f0ff1;
+$purple:  #ba3cda;
+$pink:    #f0348c;
+$red:     #e02200;
+$orange:  #d86800;
+$yellow:  #e2e217;
+$green:   #0cbe42;
+$teal:    #0dac89;
+$cyan:    #15a89c;
+
+$primary:       #718b61;
+$secondary:     $orange;
+
+// Code Block Colors
+$code-color: $pink;
+$code-bg: $gray-100;
+$code-block-bg-alpha: -0.75;
+
+// stylelint-disable-next-line value-keyword-case
+$headings-color: $secondary;
+
+// Table of Contents
+$toc-inactive-border: $secondary;
+$toc-active-border: $primary;
+
+// Links
+$link-color: $pink;

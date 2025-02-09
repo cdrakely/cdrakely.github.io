@@ -1,0 +1,16 @@
+---
+title: "Posts"
+listing:
+  type: default
+  contents: posts
+  fields: [image, date, title, subtitle, description]
+  sort: "date desc"
+  categories: true
+  sort-ui: false
+  filter-ui: false
+page-layout: full
+title-block-banner: true
+---
+
+I will update this periodically with new explorations
+

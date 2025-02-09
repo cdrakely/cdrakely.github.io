@@ -1,0 +1,553 @@
+---
+title: "The Starting Hand Question"
+author: "Clay Drakely"
+date: "2025-02-09"
+categories: [R, combinatorics, mathematics]
+toc: true
+toc-depth: 6
+image: "Kithkin_Rabble_SHM.jpg"
+---
+
+# Inspiration
+
+I received a question from a friend one afternoon. This friend is a software engineer and an avid [Magic: The Gathering](https://magic.wizards.com/en/intro){target=_blank} player. Naturally, then, it comes as no surprise the question was about optimizing his deck via some complex mathematics. I've titled this blog **The Starting Hand Question** since the question was specific to **MTG** but&mdash;since mathematicians love abstraction&mdash;I explored the question in a more *generic* setting. So, if you choose, perhaps think of this as **The 60 Marble Question**, or similar.
+
+This exploration was originally made `Jan 22, 2022`.
+
+---
+
+## The Question
+
+> I have a deck of 60 cards. Within that deck I have 3 distinct cards $\{A,B,C\}$, each with 4 copies ($|A| = 4,\ ...$). When I play a game my starting hand is **7** cards. What's the probability I have a starting hand that has at least 1 from each of $\{A,B,C\}$?
+
+Notably, 4 is the maximum allowance for duplicate cards in the standard format in **MTG** tournaments.
+
+Further, he had already taken the liberty of exhaustively simulating every hand in **python** and already knew the answer to be:
+<details><summary>Spoil the answer for me</summary>*18,179,328* successes out of *386,206,920* possibilites (*4.71%*)</details>
+
+---
+
+This gave me a starting point to explore as my combinatorics/statistics skills have never been top-notch. I discovered tools online after this exercise that are better implemented but since I found them after-the-fact I'm still willing to claim this work as my own. Deal with it.
+
+## The Algorithm
+
+### Note
+
+What I found in the end was less of a closed solution and more of an algorithm to determine the number of successful outcomes.
+
+### Rephrased Problem
+
+> Given a set $D$ of finite elements with mutually exclusive sets $\{C_1,C_2,\cdots,C_n \} = D$ and a set $\{c_1, \cdots , c_n \ | \ c_{i} = \vert C_{i}\vert , \ 1 \le i \le n \}$, how many ways can $h$ items be randomly drawn such that some specified quantity of $C_1,C_2,\cdots,C_n$, say $Q = \lbrace q_1,q_2,\cdots,q_n \rbrace$ where $q_i \le c_i$ be present?
+
+In my friends case,
+
+```{=tex}
+\begin{align}
+    \vert \{C_1,C_2,\cdots,C_n \} \vert = \vert D \vert & = 60, \\
+    h & = 7, \\
+    n & = 3, \\
+    c_{1, 2, 3} & = 4, \\
+    q_1 = q_2 = q_3 & =1
+\end{align}
+```
+
+### The Details
+
+#### Informal Process
+
+For the following to work, you must organize $C_1,C_2, \cdots, C_n$ such that the cardinality of each set is in descending order. For my use case it doesn't matter, but if $\vert C_2 \vert \gt \vert C_1 \vert$ you'd want to parse $C_2$ first.
+
+Then collect the remaining elements of $D$ that do not need to be distinguished at the end as a whole, resulting in an ordered list of **criterion** sets followed by a set of remaining elements $C_n$. Necessarily, all sets $C_1,C_2,\cdots,C_n$ are mutually exclusive. Then, generate your summation in the following way:
+
+**Layer** $1$
+
+- Sum from 1 to the cardinality of the leading partition ($\vert C_1\vert = 4$ in our example). Include the binomial coefficient (“number of elements $k$ choose $i$”). Multiply this by the next stage and move downward.
+
+**Layer** $2$ **to** $(n-1)$
+
+- Sum from 1 to $h$ minus preceding levels (respecting the number of elements in this partition, allowing at least 1 card from ALL lower non-zero criterion levels. Same coefficient construction as Layer 1.
+
+**Layer** $N$
+
+- Sum in the same manner as the last step, only this time, instead of adding another layer, fill the rest of the hand/drawn set with cards from your non-criterion pile ($C_n$).
+
+Effectively, take the sum of draws which satisfy $C_{1, \cdots , n}$.
+
+#### Formal Process
+
+Let,
+
+$A = \{c_1,c_2,\cdots,c_n\}$ be the cardinality of the respective sets $C_n$
+
+<br>
+and
+<br>
+
+$N_c = \sum_{i=1}^n c_i = \vert D \vert$. Of necessity, $N_c \le h \le \vert D \vert$
+
+
+---
+
+```{=tex}
+\begin{gather}
+\sum_{i_1=q_1}^{c_1} \sum_{i_2=q_2}^{Min(c_2,h-\sum_{j=1}^{2-1}i_j, [h-N_c + q_2])} \cdots \sum_{i_n=q_n}^{Min(c_n,h-\sum_{k=1}^{n-1}i_k, [h-N_c + q_n])} \binom{c_1}{i_1} \binom{c_2}{i_2}\cdots \binom{c_n}{h-\sum_{k=1}^{n-1}i_k}
+\end{gather}
+```
+
+---
+
+**Description of:** $Min(c_2,h-\sum_{j=1}^{1}i_j, [h-N_c + c_2])$
+
+Take the minimum of:
+
+1. $c_2$, the available cards for this partition
+1. $h-\sum_{j=1}^{2-1}i_j$, Ensure we respect the hand size
+1. $[h-N_c + c_2]$, ensure we are able to satisfy remaining criteria
+
+
+## Answering The Question
+
+Let's take the original **Starting Hand Question**.
+
+<br>
+
+```{=tex}
+\begin{align}
+    D & = \lbrace C_1,C_2,C_3,C_4\rbrace \\
+    A = \{ c_1, c_2, c_3, c_4 \} & = \lbrace 4,4,4,48 \rbrace \\
+    Q & = \lbrace 1,1,1,0 \rbrace \\
+    n & = 4 \\
+    \vert D \vert & = 60
+\end{align}
+```
+
+<br>
+
+```{=tex}
+\begin{gather}
+    \sum_{i_1=1}^{4} \lparen
+    \sum_{i_2=1}^{Min(4,7-\sum_{j=1}^{1}i_j, [7-3 + 1])} \lbrace
+    \sum_{i_3=1}^{Min(4,7-\sum_{j=1}^{2}i_j, [7-3 + 1])} \lparen
+    \sum_{i_4=0}^{Min(48,7-\sum_{j=1}^{3}i_j, [7-3 + 0])}
+        \binom{4}{i_1}
+        \binom{4}{i_2}
+        \binom{4}{i_3}
+        \binom{48}{7-\sum_{j=1}^{3}i_j} \rparen \rbrace \rparen
+\end{gather}
+```
+
+<br>
+
+Here is the R translation I made of the above using only base packages:
+
+```{r}
+#| label: comb-code
+#| code-fold: show
+#| code-summary: "R Translation using Base R"
+#| code-line-numbers: true
+
+# 1. hand_size is an integer of the draw size
+#    - Ex. You draw 7 cards for Uno.
+# 2. available is a vector of the # of items in the total pool
+#    - Ex. There are 26 red and 26 black cards in a standard deck - c(26,26).
+#    The sum of available should be the total deck size. Non-differentiated
+#    items should be grouped into one entity at the end.
+# 3. criteria is the number of items from available needed
+#    for a beginning hand size.
+#    - Ex. If I need 2 red cards and 1 black in my starting draw: c(2,1).
+#      In this example, we don't have a third 0 entry, since the deck is only
+#      red or black.
+#    - Ex. If I need 2 reds, 1 blue, and 1 green for a starting Uno hand
+#      I would use a criteria of c(2,1,1,0), where 0 declares I don't need
+#      any yellow cards.
+#
+# Output -
+# successes: Number of possible successes
+# total_possibilities: Number of total outcomes
+# percentage_success: Not rounded or multiplied by 100
+# calculation_terms: Number of terms in the sum in algorithm
+# terms_details: Details of those calculation_terms, represents a
+#   vector of variations of draws from the sets in available
+#   that represent a success and a full hand drawn.
+# Execution time: Time in seconds to execute.
+deck_comb_tot <- function(hand_size, available, criteria) {
+    # First iteration is a for loop, remaining are recursed.
+    start_time <- Sys.time()
+    calculation_terms <- 0
+    loop_track <- c(rep(0, length(available)))
+    terms_detail <- list()
+    terms_success_number <- c()
+    recurse_ret <- comb_recurse_tot(
+        1, 0, loop_track,
+        terms_detail,
+        terms_success_number,
+        hand_size, available, criteria, calculation_terms
+    )
+
+    poss <- choose(sum(available), hand_size)
+    return(list(
+        successes = recurse_ret[[1]],
+        total_possibilities = poss,
+        percentage_success = recurse_ret[[1]] / poss,
+        calculation_terms = recurse_ret[[2]],
+        terms_detail = recurse_ret[3],
+        terms_success_number = recurse_ret[[4]],
+        execution_time = Sys.time() - start_time
+    ))
+}
+
+comb_recurse_tot <- function(
+    depth, cur_hand, loop_track, terms_detail,
+    terms_success_number,
+    hand_size, avail, crit, calc_terms) {
+    # Recursive while loop
+    ret <- 0
+    iter <- crit[depth]
+    # Hand size stipulates how many elements
+    # sum(crit) reminds how many required elements we
+    #   need in the hand for success
+    # crit[depth] rolls back in the current items requirements
+    #   which makes max_iter the maximum number of elements
+    #   of this set that can be present and still render
+    #   a success.
+    max_iter <- hand_size - sum(crit) + crit[depth]
+    while (iter <= min(
+        avail[depth], # Can't have more elements that the set contains
+        hand_size - sum(cur_hand), # Can't have more elements than the hand size
+        max_iter # Can't break success criteria of the remaining sets
+    )) {
+        loop_track[depth] <- iter
+        if (depth != length(avail)) {
+            marg_ret <- comb_recurse_tot(
+                depth + 1, cur_hand + iter,
+                loop_track, terms_detail,
+                terms_success_number,
+                hand_size, avail, crit, calc_terms
+            )
+            ret <- ret + marg_ret[[1]]
+            calc_terms <- marg_ret[[2]]
+            terms_detail <- marg_ret[[3]]
+            terms_success_number <- marg_ret[[4]]
+        } else {
+            layer_return <- comb_calc(
+                avail, loop_track, hand_size,
+                terms_detail, terms_success_number
+            )
+            ret <- ret + layer_return[[1]]
+            calc_terms <- calc_terms + 1
+            terms_detail <- layer_return[[2]]
+            terms_success_number <- layer_return[[3]]
+            break
+        }
+        iter <- iter + 1
+    }
+
+    return(list(ret, calc_terms, terms_detail, terms_success_number))
+}
+
+comb_calc <- function(
+    avail, loop_track, hand_size,
+    terms_detail, terms_success_number) {
+    terms <- length(avail)
+    product <- 1
+    # Test for single term use case, otherwise for loop behaves unexpectedly.
+    if (terms > 1) {
+        # For the first n-1 terms we want to calculate using criterion cards.
+        for (t in 1:(terms - 1)) {
+            product <- product * choose(avail[t], loop_track[t])
+        }
+    }
+    # The nth term will fill the rest of the hand with remaining cards.
+    product <- product * choose(avail[terms], hand_size - sum(loop_track))
+    full_hand <- loop_track
+    full_hand[length(avail)] <- hand_size - sum(loop_track)
+    terms_detail <- append(terms_detail, list(full_hand))
+    terms_success_number <- append(terms_success_number, product)
+    return(list(product, terms_detail, terms_success_number))
+}
+```
+
+``` {r}
+#| label: run-data
+#| code-fold: show
+#| code-summary: "Function Call to Answer Our Question"
+
+answer_feedback <- deck_comb_tot(
+    hand_size = 7,
+    available = c(4, 4, 4, 48),
+    criteria = c(1, 1, 1, 0)
+)
+```
+
+```{r}
+#| label: variable-declaration
+#| echo: false
+
+total_draws <- answer_feedback$total_possibilities
+good_draws <- answer_feedback$successes
+num_terms <- answer_feedback$calculation_terms
+terms_detail <- answer_feedback$terms_detail
+terms_success_number <- answer_feedback$terms_success_number
+success_percentage <- answer_feedback$percentage_success
+time_to_calc <- answer_feedback$execution_time
+```
+
+Output:
+
+---
+
+Total # of possible combinations: **`{r} format(total_draws, nsmall = 0, big.mark = ",")`**
+
+Total # of success combinations: **`{r} format(good_draws, nsmall = 0, big.mark = ",")`**
+
+Percent chance of drawing in opening hand: **`{r} round(success_percentage*100,digits = 2)`%**
+
+Iterations required to complete this calculation: **`{r} format(num_terms, nsmall = 0, big.mark = ",")`**
+
+Execution Time: **`{r} round((time_to_calc)*1000,0)`ms**
+
+```{r}
+#| label: terms-detail-table
+#| echo: false
+
+library(gt)
+
+terms_detail_df <- terms_detail |>
+    as.data.frame() |>
+    t() |>
+    as.data.frame()
+terms_detail_df_cols <- terms_detail_df |> ncol()
+row.names(terms_detail_df) <- seq_len(nrow(terms_detail_df))
+names(terms_detail_df) <- paste("Criteria", seq_len(terms_detail_df_cols))
+terms_detail_df <- terms_detail_df |>
+    cbind(`Possible Hands with Term` = terms_success_number)
+
+terms_detail_gt <- gt(terms_detail_df) |>
+    tab_header(
+        title = "Hand Combinations"
+    ) |>
+    grand_summary_rows(
+        columns = "Possible Hands with Term",
+        fns = list(id = "Total", label = md("**Total**")) ~
+            sum(., na.rm = TRUE),
+        fmt = list(~ fmt_number(., decimals = 0))
+    ) |>
+    fmt_number(decimals = 0) |>
+    opt_interactive(use_pagination = TRUE) |>
+    opt_row_striping()
+
+terms_detail_kable <- knitr::kable(terms_detail_df, digits = 0, format.args = list(big.mark = ",",
+  scientific = FALSE))
+
+```
+
+The below table represents the details from each calculation term, and the number of *cards* present from each of the criteria groups in that successful construction.
+<br>
+
+```{r}
+#| label: terms-detail-display
+#| echo: false
+
+rmarkdown::paged_table(terms_detail_df |> dplyr::mutate("Possible Hands with Term" = format(`Possible Hands with Term`, big.mark = ",")))
+```
+
+---
+
+In simple terms, the algorithm can be thought of generating the # of hands that respect each of these individual calculation terms above, then finding the total sum.
+
+## More Examples
+
+::: {.panel-tabset}
+
+### A Partial Flush
+
+> Given a standard card deck, what's the probability you draw three of one suit, and three of another in a **7-card** draw?
+
+For a set up, we need to define 3 things:
+
+1. Our hand size: `7`
+1. The cardinality of our available sets: `13 each of the two we want,  26 we don't`
+    a. we don't care which suits gets us there, just the number
+1. The number of cards we need from each set to be successful: `3, 3, 0`
+    a. note the third is zero because we dont' *need* any to declare success
+
+``` {r}
+#| label: run-data-flush
+#| code-fold: show
+#| code-summary: "Function Call for Flush Example"
+
+flush_answer_feedback <- deck_comb_tot(
+    hand_size = 7,
+    available = c(13, 13, 26),
+    criteria = c(3, 3, 0)
+)
+```
+
+```{r}
+#| label: variable-declaration-flush
+#| echo: false
+
+flush_total_draws <- flush_answer_feedback$total_possibilities
+flush_good_draws <- flush_answer_feedback$successes
+flush_num_terms <- flush_answer_feedback$calculation_terms
+flush_terms_detail <- flush_answer_feedback$terms_detail
+flush_terms_success_number <- flush_answer_feedback$terms_success_number
+flush_success_percentage <- flush_answer_feedback$percentage_success
+flush_time_to_calc <- flush_answer_feedback$execution_time
+```
+
+Output:
+
+---
+
+Total # of possible combinations: **`{r} format(flush_total_draws, nsmall = 0, big.mark = ",")`**
+
+Total # of success combinations: **`{r} format(flush_good_draws, nsmall = 0, big.mark = ",")`**
+
+Percent chance of drawing in opening hand: **`{r} round(flush_success_percentage*100,digits = 2)`%**
+
+Iterations required to complete this calculation: **`{r} format(flush_num_terms, nsmall = 0, big.mark = ",")`**
+
+Execution Time: **`{r} round((flush_time_to_calc)*1000,0)`ms**
+
+```{r}
+#| label: terms-detail-table-flush
+#| echo: false
+
+library(gt)
+
+flush_terms_detail_df <- flush_terms_detail |>
+    as.data.frame() |>
+    t() |>
+    as.data.frame()
+flush_terms_detail_df_cols <- flush_terms_detail_df |> ncol()
+row.names(flush_terms_detail_df) <- seq_len(nrow(flush_terms_detail_df))
+names(flush_terms_detail_df) <- paste("Criteria", seq_len(flush_terms_detail_df_cols))
+flush_terms_detail_df <- flush_terms_detail_df |>
+    cbind(`Possible Hands with Term` = flush_terms_success_number)
+
+# GT Can't coalesce to web formatting yet
+flush_terms_detail_gt <- gt(flush_terms_detail_df) |>
+    tab_header(
+        title = "Hand Combinations"
+    ) |>
+    fmt_number(decimals = 0) |>
+    opt_row_striping()
+
+flush_terms_detail_kable <- knitr::kable(flush_terms_detail_df, digits = 0, format.args = list(big.mark = ",",
+  scientific = FALSE))
+
+```
+
+Output:
+<br>
+
+```{r}
+#| label: terms-detail-display-flush
+#| echo: false
+
+flush_terms_detail_kable
+```
+
+There's only a few terms here because we really don't have that much flexibility in the prompt. Out of 7 cards, we've declared what 6 need to be. With three possible groups for that 7th to come from we get three separate terms, each accounting for a huge number of hands fitting that criteria.
+
+### Cribbage
+
+> In a game of [cribbage](https://en.wikipedia.org/wiki/Cribbage), what's the probability you draw three 5's and a Jack?
+
+For a set up, we need to define 3 things:
+
+1. Our hand size: `6`
+1. The cardinality of our available sets: `4, 4, 44`
+1. The number of cards we need from each set to be successful: `3, 1, 0`
+    a. note the third is zero because we dont' *need* any to declare success
+
+::: {.callout-note}
+
+For 2. We choose not to care which suit the Jack is
+<br>
+and reminder that for 3. we the third group is zero because we don't need any for success
+
+:::
+
+
+``` {r}
+#| label: run-data-cribbage
+#| code-fold: show
+#| code-summary: "Function Call for cribbage Example"
+
+cribbage_answer_feedback <- deck_comb_tot(
+    hand_size = 6,
+    available = c(4, 4, 44),
+    criteria = c(3, 1, 0)
+)
+```
+
+```{r}
+#| label: variable-declaration-cribbage
+#| echo: false
+
+cribbage_total_draws <- cribbage_answer_feedback$total_possibilities
+cribbage_good_draws <- cribbage_answer_feedback$successes
+cribbage_num_terms <- cribbage_answer_feedback$calculation_terms
+cribbage_terms_detail <- cribbage_answer_feedback$terms_detail
+cribbage_terms_success_number <- cribbage_answer_feedback$terms_success_number
+cribbage_success_percentage <- cribbage_answer_feedback$percentage_success
+cribbage_time_to_calc <- cribbage_answer_feedback$execution_time
+```
+
+Output:
+
+---
+
+Total # of possible combinations: **`{r} format(cribbage_total_draws, nsmall = 0, big.mark = ",")`**
+
+Total # of success combinations: **`{r} format(cribbage_good_draws, nsmall = 0, big.mark = ",")`**
+
+Percent chance of drawing in opening hand: **`{r} round(cribbage_success_percentage*100,digits = 2)`%**
+
+Iterations required to complete this calculation: **`{r} format(cribbage_num_terms, nsmall = 0, big.mark = ",")`**
+
+Execution Time: **`{r} round((cribbage_time_to_calc)*1000,0)`ms**
+
+```{r}
+#| label: terms-detail-table-cribbage
+#| echo: false
+
+library(gt)
+
+cribbage_terms_detail_df <- cribbage_terms_detail |>
+    as.data.frame() |>
+    t() |>
+    as.data.frame()
+cribbage_terms_detail_df_cols <- cribbage_terms_detail_df |> ncol()
+row.names(cribbage_terms_detail_df) <- seq_len(nrow(cribbage_terms_detail_df))
+names(cribbage_terms_detail_df) <- paste("Criteria", seq_len(cribbage_terms_detail_df_cols))
+cribbage_terms_detail_df <- cribbage_terms_detail_df |>
+    cbind(`Possible Hands with Term` = cribbage_terms_success_number)
+
+
+# GT Can't coalesce to web formatting yet
+cribbage_terms_detail_gt <- gt(cribbage_terms_detail_df) |>
+    tab_header(
+        title = "Hand Combinations"
+    ) |>
+    fmt_number(decimals = 0) |>
+    opt_row_striping()
+
+cribbage_terms_detail_kable <- knitr::kable(cribbage_terms_detail_df, digits = 0, format.args = list(big.mark = ",",
+  scientific = FALSE))
+
+```
+
+Output:
+<br>
+
+```{r}
+#| label: terms-detail-display-cribbage
+#| echo: false
+
+cribbage_terms_detail_kable
+```
+
+:::

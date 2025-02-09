@@ -1,0 +1,18 @@
+---
+title: "Home"
+image: brand/profile.jpg
+about:
+  template: jolla
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: https://linkedin.com/in/cdrakely
+    - icon: github
+      text: Github
+      href: https://github.com/cdrakely
+
+---
+
+# Welcome
+
+I've created this space to catalogue the type of analysis work I've done and enjoy doing in my free time. I also want to allow myself to dabble more in *fun* mathematics which we so rarely get to do outside of academia. Most of my work is done in service of my employment and thus can't be shared here. But hopefully you can find something interesting nestled in my posts or elsewhere. Should you wish to contact me, [feel free](mailto:clayd12x96@gmail.com?subject=Coming%20from%20your%20Github%20Blog){target=_BLANK}.

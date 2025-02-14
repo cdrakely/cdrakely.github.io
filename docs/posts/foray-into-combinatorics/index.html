@@ -232,7 +232,6 @@ window.Quarto = {
   <li><a href="#the-question" id="toc-the-question" class="nav-link" data-scroll-target="#the-question">The Question</a></li>
   <li><a href="#the-algorithm" id="toc-the-algorithm" class="nav-link" data-scroll-target="#the-algorithm">The Algorithm</a>
   <ul>
-  <li><a href="#note" id="toc-note" class="nav-link" data-scroll-target="#note">Note</a></li>
   <li><a href="#rephrased-problem" id="toc-rephrased-problem" class="nav-link" data-scroll-target="#rephrased-problem">Rephrased Problem</a></li>
   <li><a href="#the-details" id="toc-the-details" class="nav-link" data-scroll-target="#the-details">The Details</a>
   <ul>
@@ -276,10 +275,19 @@ Spoil the answer for me
 </section>
 <section id="the-algorithm" class="level2">
 <h2 class="anchored" data-anchor-id="the-algorithm">The Algorithm</h2>
-<section id="note" class="level3">
-<h3 class="anchored" data-anchor-id="note">Note</h3>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>What I found in the end was less of a closed solution and more of an algorithm to determine the number of successful outcomes.</p>
-</section>
+</div>
+</div>
 <section id="rephrased-problem" class="level3">
 <h3 class="anchored" data-anchor-id="rephrased-problem">Rephrased Problem</h3>
 <blockquote class="blockquote">
@@ -499,7 +507,7 @@ Spoil the answer for me
 <p>Total # of success combinations: <strong>18,179,328</strong></p>
 <p>Percent chance of drawing in opening hand: <strong>4.71%</strong></p>
 <p>Iterations required to complete this calculation: <strong>32</strong></p>
-<p>Execution Time: <strong>40ms</strong></p>
+<p>Execution Time: <strong>100ms</strong></p>
 <p>The below table represents the details from each calculation term, and the number of <em>cards</em> present from each of the criteria groups in that successful construction. <br></p>
 <div class="cell">
 <div class="cell-output-display">
@@ -590,28 +598,22 @@ Spoil the answer for me
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <blockquote class="blockquote">
-<p>In a game of <a href="https://en.wikipedia.org/wiki/Cribbage">cribbage</a>, what’s the probability you draw three 5’s and a Jack?</p>
+<p>In a game of <a href="https://en.wikipedia.org/wiki/Cribbage" target="_BLANK">cribbage</a>, what’s the probability you draw three 5’s and a Jack?</p>
 </blockquote>
 <p>For a set up, we need to define 3 things:</p>
 <ol type="1">
 <li>Our hand size: <code>6</code></li>
 <li>The cardinality of our available sets: <code>4, 4, 44</code></li>
-<li>The number of cards we need from each set to be successful: <code>3, 1, 0</code>
-<ol type="a">
-<li>note the third is zero because we dont’ <em>need</em> any to declare success</li>
-</ol></li>
+<li>The number of cards we need from each set to be successful: <code>3, 1, 0</code></li>
 </ol>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
+<div class="callout callout-style-simple callout-note">
+<div class="callout-body d-flex">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-title-container flex-fill">
-Note
+<div class="callout-body-container">
+<p>For 2. We choose not to care which suit the Jack is <br> and reminder that for 3. we the third group is zero because we don’t <em>need</em> any for success</p>
 </div>
-</div>
-<div class="callout-body-container callout-body">
-<p>For 2. We choose not to care which suit the Jack is <br> and reminder that for 3. we the third group is zero because we don’t need any for success</p>
 </div>
 </div>
 <div class="cell">

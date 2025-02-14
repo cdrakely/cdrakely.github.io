@@ -31,9 +31,13 @@ This gave me a starting point to explore as my combinatorics/statistics skills h
 
 ## The Algorithm
 
+::: {.callout-note}
+
 ### Note
 
 What I found in the end was less of a closed solution and more of an algorithm to determine the number of successful outcomes.
+
+:::
 
 ### Rephrased Problem
 
@@ -453,20 +457,19 @@ There's only a few terms here because we really don't have that much flexibility
 
 ### Cribbage
 
-> In a game of [cribbage](https://en.wikipedia.org/wiki/Cribbage), what's the probability you draw three 5's and a Jack?
+> In a game of [cribbage](https://en.wikipedia.org/wiki/Cribbage){target=_BLANK}, what's the probability you draw three 5's and a Jack?
 
 For a set up, we need to define 3 things:
 
 1. Our hand size: `6`
 1. The cardinality of our available sets: `4, 4, 44`
 1. The number of cards we need from each set to be successful: `3, 1, 0`
-    a. note the third is zero because we dont' *need* any to declare success
 
-::: {.callout-note}
+::: {.callout-note appearance="simple"}
 
 For 2. We choose not to care which suit the Jack is
 <br>
-and reminder that for 3. we the third group is zero because we don't need any for success
+and reminder that for 3. we the third group is zero because we don't *need* any for success
 
 :::
 
